@@ -1,0 +1,40 @@
+---
+class: 4
+flags: 0x0000
+unid: AF08A468B62B013185258CF800645CD7
+items:
+  - name: $DesignerBuild
+    type: text
+    data: HCL Nomad (WebBrowser) local build
+    signed: true
+  - name: $DesignerVersion
+    type: text
+    data: 8.5.3
+    signed: true
+  - name: $Flags
+    type: text
+    data: 34Ci~Q
+  - name: $ImagesColorize
+    type: number
+    data: 0
+    signed: true
+  - name: $ImagesHigh
+    type: number
+    data: 1
+    signed: true
+  - name: $ImagesWide
+    type: number
+    data: 1
+    signed: true
+  - name: $MimeType
+    type: text
+    data: image/png
+    signed: true
+  - name: $TITLE
+    type: text
+    data: $DBIcon
+  - name: $ImageData
+    type: composite
+    signed: true
+    nonsummary: true
+remaining: []

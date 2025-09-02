@@ -1,0 +1,16 @@
+---
+class: 32776
+flags: 0x0000
+unid: B4D5D3B4B02BBB0C85258CF800645CD3
+items:
+  - name: $Formula
+    type: formula
+    data: "@All"
+    opaque: HAAFAA4ACgABAAQAJCQkJAQABAAAAAgAZgADAA==
+  - name: $FormulaClass
+    type: text
+    data: "1"
+  - name: $TITLE
+    type: text
+    data: ""
+remaining: []
