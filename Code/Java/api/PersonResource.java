@@ -8,6 +8,12 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
+
 import java.util.Map;
 
 import repository.PersonRepository;
@@ -19,6 +25,9 @@ public class PersonResource {
 	    PersonRepository personRepository;
 
 	    @GET
+	    @Operation(summary = "Get a person by UNID", description = "Returns the person document if found, otherwise 404")
+	    @APIResponse(responseCode = "200", description = "Person found")
+	    @APIResponse(responseCode = "404", description = "Person not found")
 	    public Response getOne(@PathParam("id") String id) {
 	        var personOpt = personRepository.findById(id);
 	        if (personOpt.isEmpty()) {
