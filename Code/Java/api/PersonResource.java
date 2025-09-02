@@ -18,7 +18,7 @@ import java.util.Map;
 
 import repository.PersonRepository;
 
-@Path("people/{id}")                       // singular item under the collection
+@Path("people")                      // singular item under the collection
 @Produces(MediaType.APPLICATION_JSON)
 public class PersonResource {
 	 @Inject
@@ -28,6 +28,7 @@ public class PersonResource {
 	    @Operation(summary = "Get a person by UNID", description = "Returns the person document if found, otherwise 404")
 	    @APIResponse(responseCode = "200", description = "Person found")
 	    @APIResponse(responseCode = "404", description = "Person not found")
+	    @Path("{id}")
 	    public Response getOne(@PathParam("id") String id) {
 	        var personOpt = personRepository.findById(id);
 	        if (personOpt.isEmpty()) {

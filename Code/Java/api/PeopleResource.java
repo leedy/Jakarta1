@@ -14,6 +14,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.core.UriInfo;
+import jakarta.ws.rs.core.Context;
+
+
 import org.openntf.xsp.jakarta.nosql.mapping.extension.ViewQuery;
 
 import repository.PersonRepository;
@@ -169,4 +176,34 @@ public class PeopleResource {
                 ? Response.status(Response.Status.NOT_FOUND).entity(out).type(MediaType.APPLICATION_JSON).build()
                 : Response.ok(out, MediaType.APPLICATION_JSON).build();
     }
+    
+    
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response create(Person person, @Context UriInfo uriInfo) {
+        if (person == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(Map.of("error", "Request body required"))
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // Optional sanity: ignore any client-sent UNID; Domino will assign one
+        person.setUnid(null);
+
+        var saved = personRepository.save(person);   // Domino assigns UNID here
+        var unid  = saved.getUnid();
+
+        var location = uriInfo.getAbsolutePathBuilder()
+                              .path(unid)
+                              .build();
+
+        return Response.created(location)
+                .entity(saved)                          // return the saved Person
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+    
+    
+    
 }
