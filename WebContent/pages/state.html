@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>People by State (Item Endpoint)</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; margin: 24px; }
+    .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+    select, button { font-size: 14px; padding: 8px 10px; }
+    button { cursor: pointer; }
+    .status { font-size: 13px; margin-left: 8px; }
+    #count { margin-bottom: 8px; font-size: 14px; font-weight: bold; }
+    table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background: #f6f6f6; position: sticky; top: 0; }
+  </style>
+</head>
+<body>
+  <h1>People by State (Item)</h1>
+
+  <div class="row">
+    <label for="state">State:</label>
+    <select id="state"></select>
+    <button id="go" type="button">Search</button>
+    <span id="status" class="status" aria-live="polite"></span>
+  </div>
+
+  <div id="count"></div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Last Name</th>
+        <th>First Name</th>
+        <th>State</th>
+        <th>Key</th>
+        <th>UNID</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+  <script>
+    const ITEM_BASE = "http://epcot.notesin9.test/demoapp/appcode.nsf/xsp/app/people/by-state/item";
+
+    const stateSel = document.getElementById("state");
+    const goBtn = document.getElementById("go");
+    const statusEl = document.getElementById("status");
+    const countEl = document.getElementById("count");
+    const tbody = document.getElementById("tbody");
+
+    (function initStates(){
+      const STATES = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
+      STATES.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s; opt.textContent = s;
+        stateSel.appendChild(opt);
+      });
+      stateSel.value = "PA";
+    })();
+
+    function setBusy(b, msg){
+      goBtn.disabled = b;
+      statusEl.textContent = b ? (msg || "Loading...") : "";
+    }
+
+    function renderRows(rows, countFromServer){
+      tbody.innerHTML = "";
+      countEl.textContent = "Count: " + (countFromServer || rows.length);
+
+      if (!rows.length) {
+        statusEl.textContent = "No results.";
+        return;
+      }
+      const frag = document.createDocumentFragment();
+      rows.forEach(r => {
+        const tr = document.createElement("tr");
+        const cells = [
+          r.lastName || "",
+          r.firstName || "",
+          r.state || "",
+          r.key || "",
+          r.unid || ""
+        ];
+        cells.forEach(v => {
+          const td = document.createElement("td");
+          td.textContent = v;
+          tr.appendChild(td);
+        });
+        frag.appendChild(tr);
+      });
+      tbody.appendChild(frag);
+    }
+
+    async function run(){
+      const state = stateSel.value.trim().toUpperCase() || "PA";
+      const url = ITEM_BASE + "/" + encodeURIComponent(state) + "?t=" + Date.now();
+      setBusy(true, "Loading...");
+      try {
+        const res = await fetch(url, { headers: { "Accept": "application/json" } });
+        if (!res.ok) throw new Error("HTTP " + res.status + " " + res.statusText);
+        const json = await res.json();
+        let rows = Array.isArray(json.results) ? json.results : [];
+        // Sort by last name, then first name
+        rows.sort((a, b) => {
+          const lnA = (a.lastName || "").toLowerCase();
+          const lnB = (b.lastName || "").toLowerCase();
+          if (lnA < lnB) return -1;
+          if (lnA > lnB) return 1;
+          const fnA = (a.firstName || "").toLowerCase();
+          const fnB = (b.firstName || "").toLowerCase();
+          if (fnA < fnB) return -1;
+          if (fnA > fnB) return 1;
+          return 0;
+        });
+        renderRows(rows, json.count);
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "Error: " + err.message;
+      } finally {
+        setBusy(false, "");
+      }
+    }
+
+    goBtn.addEventListener("click", run);
+    document.addEventListener("keydown", e => {
+      if (e.key === "Enter") { e.preventDefault(); run(); }
+    });
+  </script>
+</body>
+</html>

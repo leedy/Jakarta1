@@ -29,4 +29,14 @@ public interface PersonRepository extends DominoRepository<Person, String> {
     Stream<Person> findByLastName(String lastName);
 	
 
+    
+    
+    
+ // DQL: match the form/entity and the State item
+ //   @Query("SELECT form = 'fUserName' AND State = :state")
+ //   List<Person> findByState(@Param("state") String state);
+    
+    
+//    @ViewQuery("ByState") // your view that is keyed by State
+ //   List<Person> findByStateView(@Key String state);
 }

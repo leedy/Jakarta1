@@ -7,10 +7,11 @@ import jakarta.nosql.Id;
 //Finally, in the latest version, you can also do @DocumentConfig(formName="SomeThirdName") to override both. 
 //That's useful in the case where you have entity classes representing the same form name in multiple DBs, since 
 //NoSQL entity names must be unique
-
-
 // @DocumentConfig(formName="SomeThirdName")
-@Entity("fUserName")
+
+
+
+@Entity("fUserName")  // normal formname use
 public class Person {
 	@Id
 	private String unid;

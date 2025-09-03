@@ -1,0 +1,26 @@
+---
+class: 4
+flags: 0x0000
+unid: C43A750A2484C4B585258CFA000663BB
+items:
+  - name: $DesignerVersion
+    type: text
+    data: 8.5.3
+  - name: $FileNames
+    type: text
+    data: swagger/swagger-ui-es-bundle.js
+    signed: true
+  - name: $Flags
+    type: text
+    data: ~C4g
+  - name: $FlagsExt
+    type: text
+    data: w
+  - name: $TITLE
+    type: text
+    data: swagger/swagger-ui-es-bundle.js
+  - name: $FileData
+    type: composite
+    signed: true
+    nonsummary: true
+remaining: []

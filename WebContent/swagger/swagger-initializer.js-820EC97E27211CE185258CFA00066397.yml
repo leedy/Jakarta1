@@ -1,0 +1,26 @@
+---
+class: 4
+flags: 0x0000
+unid: 820EC97E27211CE185258CFA00066397
+items:
+  - name: $DesignerVersion
+    type: text
+    data: 8.5.3
+  - name: $FileNames
+    type: text
+    data: swagger/swagger-initializer.js
+    signed: true
+  - name: $Flags
+    type: text
+    data: ~C4g
+  - name: $FlagsExt
+    type: text
+    data: w
+  - name: $TITLE
+    type: text
+    data: swagger/swagger-initializer.js
+  - name: $FileData
+    type: composite
+    signed: true
+    nonsummary: true
+remaining: []

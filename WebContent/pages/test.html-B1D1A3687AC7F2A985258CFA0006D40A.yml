@@ -1,0 +1,29 @@
+---
+class: 4
+flags: 0x0000
+unid: B1D1A3687AC7F2A985258CFA0006D40A
+items:
+  - name: $DesignerVersion
+    type: text
+    data: 8.5.3
+  - name: $FileNames
+    type: text
+    data: pages/test.html
+    signed: true
+  - name: $Flags
+    type: text
+    data: ~C4g
+  - name: $FlagsExt
+    type: text
+    data: w
+  - name: $MimeType
+    type: text
+    data: text/html
+  - name: $TITLE
+    type: text
+    data: pages/test.html
+  - name: $FileData
+    type: composite
+    signed: true
+    nonsummary: true
+remaining: []
