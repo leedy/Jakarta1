@@ -19,6 +19,10 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.core.UriBuilder;
+
+import util.KeyGen;
 
 
 import org.openntf.xsp.jakarta.nosql.mapping.extension.ViewQuery;
@@ -178,30 +182,57 @@ public class PeopleResource {
     }
     
     
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response create(Person person, @Context UriInfo uriInfo) {
-        if (person == null) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(Map.of("error", "Request body required"))
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
+ //   @POST
+//    @Consumes(MediaType.APPLICATION_JSON)
+//    public Response create(Person person, @Context UriInfo uriInfo) {
+//        if (person == null) {
+//            return Response.status(Response.Status.BAD_REQUEST)
+//                    .entity(Map.of("error", "Request body required"))
+ //                   .type(MediaType.APPLICATION_JSON)
+  //                  .build();
+ //       }
 
         // Optional sanity: ignore any client-sent UNID; Domino will assign one
-        person.setUnid(null);
+//        person.setUnid(null);
 
-        var saved = personRepository.save(person);   // Domino assigns UNID here
-        var unid  = saved.getUnid();
+//        var saved = personRepository.save(person);   // Domino assigns UNID here
+//        var unid  = saved.getUnid();
 
-        var location = uriInfo.getAbsolutePathBuilder()
-                              .path(unid)
-                              .build();
+//        var location = uriInfo.getAbsolutePathBuilder()
+//                             .path(unid)
+//                              .build();
 
-        return Response.created(location)
-                .entity(saved)                          // return the saved Person
-                .type(MediaType.APPLICATION_JSON)
-                .build();
+//        return Response.created(location)
+//                .entity(saved)                          // return the saved Person
+//                .type(MediaType.APPLICATION_JSON)
+//                .build();
+//    }
+    
+    @POST
+    public Response create(Person incoming, @Context UriInfo uriInfo) {
+      if (incoming == null) {
+        throw new BadRequestException("Missing JSON body");
+      }
+      if (isBlank(incoming.getFirstName()) || isBlank(incoming.getLastName()) || isBlank(incoming.getState())) {
+        throw new BadRequestException("firstName, lastName, and state are required");
+      }
+
+      // If client didn't provide a key, generate a short one
+      if (isBlank(incoming.getKey())) {
+        incoming.setKey(KeyGen.defaultKey()); // e.g., 11-char Base64URL or 12-char hex
+      }
+
+      // Optional: ensure uniqueness of 'key' (retry a few times if you like)
+      // for (int i = 0; i < 3; i++) {
+      //   if (!personRepository.existsByKey(incoming.getKey())) break;
+      //   incoming.setKey(KeyGen.defaultKey());
+      // }
+
+      Person saved = personRepository.save(incoming);
+
+      // Build Location: /people/{unid}
+      UriBuilder ub = uriInfo.getAbsolutePathBuilder().path(saved.getUnid());
+      return Response.created(ub.build()).entity(saved).build(); // 201 + JSON of created doc
     }
     
     @GET
@@ -233,4 +264,7 @@ public class PeopleResource {
                 : Response.ok(out, MediaType.APPLICATION_JSON).build();
     }
     
+    private static boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
+      }
 }

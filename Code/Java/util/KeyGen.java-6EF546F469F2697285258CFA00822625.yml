@@ -1,0 +1,23 @@
+---
+class: 4
+flags: 0x0000
+unid: 6EF546F469F2697285258CFA00822625
+items:
+  - name: $DesignerVersion
+    type: text
+    data: 8.5.3
+  - name: $FileNames
+    type: text
+    data: util/KeyGen.java
+    signed: true
+  - name: $Flags
+    type: text
+    data: "34567Cg~["
+  - name: $TITLE
+    type: text
+    data: util/KeyGen.java
+  - name: $FileData
+    type: composite
+    signed: true
+    nonsummary: true
+remaining: []
