@@ -204,6 +204,33 @@ public class PeopleResource {
                 .build();
     }
     
-    
+    @GET
+    @Path("by-state/item/{state}")
+    public Response byStateItem(@PathParam("state") String state) {
+        if (state == null || state.isBlank()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(Map.of("error", "state is required"))
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        long t0 = System.nanoTime();
+        List<Person> list;
+        try (var stream = personRepository.findByState(state)) {
+            list = stream.toList();
+        }
+        long durationMs = (System.nanoTime() - t0) / 1_000_000;
+
+        var out = new LinkedHashMap<String, Object>();
+        out.put("method", "item");
+        out.put("state", state);
+        out.put("count", (long) list.size());
+        out.put("durationMs", durationMs);
+        out.put("results", list);
+
+        return list.isEmpty()
+                ? Response.status(Response.Status.NOT_FOUND).entity(out).type(MediaType.APPLICATION_JSON).build()
+                : Response.ok(out, MediaType.APPLICATION_JSON).build();
+    }
     
 }

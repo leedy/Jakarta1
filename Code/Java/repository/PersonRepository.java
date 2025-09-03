@@ -16,6 +16,11 @@ public interface PersonRepository extends DominoRepository<Person, String> {
 	
 	Stream<Person> findAll();
 	
+	 // Item-based (no view)
+    Stream<Person> findByState(String state);
+    
+    
+	
 	// View-backed (requires a view named "byLastName" with first sorted/categorized column = LastName)
     @ViewDocuments("byLastName")
     Stream<Person> findByLastNameInView(ViewQuery query);
