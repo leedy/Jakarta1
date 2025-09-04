@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>REST API Data Table</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    th { position: sticky; top: 0; background: #f8f9fa; z-index: 1; }
+  </style>
+</head>
+<body class="bg-light">
+  <div class="container py-4">
+    <h1 class="h3 mb-4">REST API Data Table</h1>
+
+    <div class="row g-3 align-items-end mb-2">
+      <div class="col-12 col-sm-6 col-md-4">
+        <label for="stateDropdown" class="form-label">State</label>
+        <select id="stateDropdown" class="form-select">
+          <option value="">Select a state</option>
+          <option value="AL">Alabama</option>
+          <option value="AK">Alaska</option>
+          <option value="AZ">Arizona</option>
+          <option value="AR">Arkansas</option>
+          <option value="CA">California</option>
+          <option value="CO">Colorado</option>
+          <option value="CT">Connecticut</option>
+          <option value="DE">Delaware</option>
+          <option value="FL">Florida</option>
+          <option value="GA">Georgia</option>
+          <option value="HI">Hawaii</option>
+          <option value="ID">Idaho</option>
+          <option value="IL">Illinois</option>
+          <option value="IN">Indiana</option>
+          <option value="IA">Iowa</option>
+          <option value="KS">Kansas</option>
+          <option value="KY">Kentucky</option>
+          <option value="LA">Louisiana</option>
+          <option value="ME">Maine</option>
+          <option value="MD">Maryland</option>
+          <option value="MA">Massachusetts</option>
+          <option value="MI">Michigan</option>
+          <option value="MN">Minnesota</option>
+          <option value="MS">Mississippi</option>
+          <option value="MO">Missouri</option>
+          <option value="MT">Montana</option>
+          <option value="NE">Nebraska</option>
+          <option value="NV">Nevada</option>
+          <option value="NH">New Hampshire</option>
+          <option value="NJ">New Jersey</option>
+          <option value="NM">New Mexico</option>
+          <option value="NY">New York</option>
+          <option value="NC">North Carolina</option>
+          <option value="ND">North Dakota</option>
+          <option value="OH">Ohio</option>
+          <option value="OK">Oklahoma</option>
+          <option value="OR">Oregon</option>
+          <option value="PA">Pennsylvania</option>
+          <option value="RI">Rhode Island</option>
+          <option value="SC">South Carolina</option>
+          <option value="SD">South Dakota</option>
+          <option value="TN">Tennessee</option>
+          <option value="TX">Texas</option>
+          <option value="UT">Utah</option>
+          <option value="VT">Vermont</option>
+          <option value="VA">Virginia</option>
+          <option value="WA">Washington</option>
+          <option value="WV">West Virginia</option>
+          <option value="WI">Wisconsin</option>
+          <option value="WY">Wyoming</option>
+        </select>
+      </div>
+      <div class="col-auto">
+        <button id="searchBtn" type="button" class="btn btn-primary">Search</button>
+      </div>
+      <div class="col-auto">
+        <span id="status" class="text-muted small" aria-live="polite"></span>
+      </div>
+    </div>
+
+    <div id="count" class="mb-2 fw-semibold"></div>
+
+    <div class="table-responsive shadow-sm">
+      <table id="dataTable" class="table table-sm table-striped table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th data-key="lastName">Last Name</th>
+            <th data-key="firstName">First Name</th>
+            <th data-key="state">State</th>
+            <th data-key="key">Key</th>
+            <th data-key="unid">UNID</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Epcot server item endpoint (path param)
+    const BASE_URL = "http://epcot.notesin9.test/demoapp/appcode.nsf/xsp/app/people/by-state/item";
+
+    const dropdown = document.getElementById("stateDropdown");
+    const table = document.getElementById("dataTable");
+    const tbody = table.querySelector("tbody");
+    const statusEl = document.getElementById("status");
+    const countEl = document.getElementById("count");
+    const searchBtn = document.getElementById("searchBtn");
+
+    function setStatus(msg) { statusEl.textContent = msg || ""; }
+
+    function getHeaderKeys() {
+      return Array.from(table.querySelectorAll("thead th")).map(th => th.getAttribute("data-key"));
+    }
+
+    function populateTable(rows) {
+      tbody.innerHTML = "";
+      const keys = getHeaderKeys();
+      const frag = document.createDocumentFragment();
+
+      rows.forEach(obj => {
+        const tr = document.createElement("tr");
+        keys.forEach(k => {
+          const td = document.createElement("td");
+          td.textContent = obj && obj[k] ? obj[k] : "";
+          tr.appendChild(td);
+        });
+        frag.appendChild(tr);
+      });
+
+      tbody.appendChild(frag);
+      countEl.textContent = "Count: " + rows.length;
+    }
+
+    async function fetchData(stateAbbreviation) {
+      const url = BASE_URL + "/" + encodeURIComponent(stateAbbreviation);
+      setStatus("Loading...");
+      searchBtn.disabled = true;
+      dropdown.disabled = true;
+      try {
+        const res = await fetch(url, { headers: { "Accept": "application/json" } });
+        if (!res.ok) throw new Error("HTTP " + res.status + " " + res.statusText);
+        const json = await res.json();
+        const rows = Array.isArray(json.results) ? json.results : [];
+        populateTable(rows);
+        setStatus(rows.length ? "" : "No results.");
+      } catch (e) {
+        console.error(e);
+        setStatus("Error: " + e.message);
+        tbody.innerHTML = "";
+        countEl.textContent = "";
+      } finally {
+        searchBtn.disabled = false;
+        dropdown.disabled = false;
+      }
+    }
+
+    function search() {
+      const state = dropdown.value.trim();
+      if (!state) {
+        alert("Please select a state.");
+        return;
+      }
+      fetchData(state);
+    }
+
+    searchBtn.addEventListener("click", search);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); search(); }
+    });
+  </script>
+
+  <!-- Bootstrap 5 JS (optional, not required for this page) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

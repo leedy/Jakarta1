@@ -1,0 +1,29 @@
+---
+class: 4
+flags: 0x0000
+unid: 6C5A5EE145F8360B85258CFA007BCC8B
+items:
+  - name: $DesignerVersion
+    type: text
+    data: 8.5.3
+  - name: $FileNames
+    type: text
+    data: pages/state2.html
+    signed: true
+  - name: $Flags
+    type: text
+    data: ~C4g
+  - name: $FlagsExt
+    type: text
+    data: w
+  - name: $MimeType
+    type: text
+    data: text/html
+  - name: $TITLE
+    type: text
+    data: pages/state2.html
+  - name: $FileData
+    type: composite
+    signed: true
+    nonsummary: true
+remaining: []

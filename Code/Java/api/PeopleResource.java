@@ -209,6 +209,7 @@ public class PeopleResource {
 //    }
     
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response create(Person incoming, @Context UriInfo uriInfo) {
       if (incoming == null) {
         throw new BadRequestException("Missing JSON body");
@@ -245,6 +246,8 @@ public class PeopleResource {
                     .build();
         }
 
+        state = state.trim().toUpperCase();
+        
         long t0 = System.nanoTime();
         List<Person> list;
         try (var stream = personRepository.findByState(state)) {
